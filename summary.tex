@@ -1,0 +1,44 @@
+\documentclass{article}
+
+%usepackages
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[letterpaper, portrait, margin=1.6in]{geometry}
+\usepackage{fancyhdr}
+
+%new commands
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\inv}{^{-1}}
+\newcommand{\img}{\textmd{Im}\:}
+\newcommand{\cok}{\textmd{coker}}
+\newcommand{\fracfield}{\textmd{frac}\:}
+
+%new theorem environments
+\newtheorem{definition}{Definition}[section]
+%title
+\title{Title}
+\author{Luca Bracone}
+
+\begin{document}
+	\maketitle
+	\section{Basic Machine Learning}
+	\begin{definition}[Perceptron]
+		A Perceptron is a function $ p:\R^n \to \R $ given by 
+		\[ p(x_1, \dots , x_n) = g \left( w_0 + \sum_{i=1}^{n} w_i x_i \right)  \]
+		Where $ w_0, \dots, w_n \in \R $ are called the weights of $p$ and $g:\R \to \R $ is any non-linear function called the activation.
+		Most of the time \[ g(x)=\frac{e^x}{e^x+1} \] the sigmoid function.
+	\end{definition}
+	\begin{definition}[Artificial Neural Network]
+		
+	\end{definition}
+	\begin{figure}
+	\includegraphics[width=128px]{128px-Colored_neural_network.png}
+\end{figure}
+\end{document}
