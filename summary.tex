@@ -6,6 +6,7 @@
 \usepackage[normalem]{ulem}
 \usepackage{enumitem}
 \usepackage{amsmath}
+\usepackage{cancel}
 \usepackage{amssymb}
 \usepackage{hyperref}
 \usepackage{tikz}
@@ -23,12 +24,14 @@
 \newcommand{\img}{\textmd{Im}\:}
 \newcommand{\cok}{\textmd{coker}}
 \newcommand{\conv}{\textmd{conv}}
+\newcommand{\vertices}{\textmd{vert}}
 \newcommand{\st}{\textmd{ s.t. }}
 \newcommand{\fracfield}{\textmd{frac}\:}
 
 %new theorem environments
 \newtheorem{definition}{Definition}[section]
-\newtheorem{algodisplay}{Algorithm}[section]
+\newtheorem{lemma}{Lemma}[section]
+\newtheorem{example}{Example}[section]
 %title
 \title{Summary}
 \author{Luca Bracone}
@@ -118,7 +121,7 @@
 		In that case instead of convex hull, we speak of $k$-simplex.
 	\end{definition}
 	\begin{definition} [face, coface]
-		Let $ \{u_{i_0},...,u_{i_m} \} \subseteq \{u_0,...,u_k\} $ we say that $ \tau = \conv\{u_{i_1},...,u_{i_m}\} $ is a face of $ \sigma = \conv\{u_1,..,u_k\} $ which we write $ \tau < \sigma $. Equivalently $ \sigma $ is a coface of $ \tau $.
+		Let $ \{u_{i_0},...,u_{i_m} \} \subseteq \{u_0,...,u_k\} $ we say that $ \tau = \conv\{u_{i_1},...,u_{i_m}\} $ is a face of $ \sigma = \conv\{u_1,..,u_k\} $ which we write $ \tau < \sigma $. Equivalently $ \sigma $ is a co-face of $ \tau $.
 	\end{definition}
 	\begin{definition}[simplicial complex]
 		A simplicial complex $K$ is a collection of simplices such that:
@@ -127,6 +130,63 @@
 			\item $ \forall \sigma,\tau \in K, \ \sigma \cap \tau $ is either empty or a face.
 		\end{enumerate}
 	The dimension of $K$ is $ \dim K = \max_{\sigma \in K} \dim \sigma $ Where the dimension of a $k$-simplex is $k$.
+	The Underlying space of $K$, $|K|$ is the topological space $ \bigcup_{\sigma \in K} \sigma $ with the subspace topology.
 	\end{definition}
+%todo:add examples of complexes
+\begin{definition}[triangulation]
+	Let $X$ be a topological space and $K$ a simplicial complex, if there exists a homeomorphism $ \phi : X \to |K| $ we say that $X$ is triangulable. In that case the couple $ (K,\phi) $ is called a triangulation of $X$
+\end{definition}
+	\begin{definition}[sub-complex]
+		A subset $L \subseteq K$ is a subcomplex of K, if it is itself a complex. It is called full if it contains all vertices of $K$.
+	\end{definition}
+	\begin{example}[skeleton]
+		The $j$-skeleton of complex $K$ is $K^{(j)}= \{ \sigma \in K \st \dim\sigma \leq j \} \subseteq K $. In particular the 0-skeleton is called $\vertices(K)$ the vertices of $K$
+	\end{example}
+	\begin{definition}[star and link]
+		Let $K$ be a simplicial complex and pick $ \sigma \in K $. Its star, $ st\sigma = \{ \tau \in K \st \tau < \sigma \} $. unfortunately it's not a sub-complex of $K$ because it's not closed under taking faces. For that we define the closed star $ \overline{st}\sigma $ the smallest sub-complex that contains the star.
+		%todo explain this better
+		Similarly, the link of a simplex $ lk\sigma = \{ \tau \in \overline{st}\sigma \st \tau \cap \sigma = \emptyset \} $ the set of simplices in the closed star that don't touch $\sigma$
+	\end{definition}
+	\begin{definition}[simplicial maps, homeomorphisms]
+		Let $K$, $L$ be two simplicial complexes and $ \phi: \vertices K \to \vertices L $ a map such that vertices of every simplex in $K$ gets mapped to a vertex of a simplex in $L$, in that case $\phi$ is called a vertex map.The map $f: |K| \to |L|$ defined by $ \sum_{i=0}^n \lambda_i u_i \mapsto \sum_{i=0}^n \lambda_i \phi(u_i) $ is called a simplicial map. If $ \phi $ is bijective and $ \phi\inv $ is also a vertex map, we speak instead of simplicial homeomorphism.
+	\end{definition}
+
+	\section{Simplicial Homology}
+	\begin{definition}[p-chain]
+		Let $K$ be a simplicial complex $ p $-chains are formal sums of $p$-simplices of $K$ over a field: \[ c = \sum_{i=1}^{n} a_i \sigma_i \] componentwise addition makes it into a commutative group $ (C_p, +) $. For the time being the field in question is $ \mathbb{F}_2 $.
+	\end{definition}
+\begin{definition}[boundary]
+	the boundary of a $ p $-simplex is the sum of its $ (p-1) $-faces: \[ \partial_p c = \sum_{j=1}^n [\sigma_1, \dots , \cancel{\sigma_j} , \dots , \sigma_p] \]
+\end{definition}
+
+Turns out $ \partial_p : C_p \to C_{p-1} $ is a group homomorphism. for a simplicial complex $K$ we define its chain complex:
+\[\mathcal{C}_K: \ \dots \longrightarrow C_p \stackrel{\partial_p}{\longrightarrow} C_{p-1} \stackrel{\partial_{p-1}}{\longrightarrow} \dots \stackrel{\partial_1}{\longrightarrow} C_0 \]
+
+\begin{lemma}[Fundamental of Homology]
+	For all $p$, $d \in C_{p+1}$, we have $ \partial_{p} \partial_{p+1} d = 0$
+	%todo: add proof ??
+\end{lemma}
+
+Whenever we have an interesting homomorphism it is natural to want to know more about its kernel and image, in this case they have special names
+\begin{definition}[$p$-boundaries and $p$-cycles]
+	$p$-cycles are $ \ker\partial_{p} = \{ c \in C_p \st \partial c = 0 \} = Z_p $\\
+	$p$-boundaries are $ \img\partial_{p+1} = \{ c \in C_p \st \exists d \in C_{p+1} , \ c=\partial d \} = B_p $
+\end{definition}
+
+Note that if $ c \in B_p $ then $ \partial c = \partial \partial d = 0 $ so, $ B_p \subseteq Z_p $. But in general $ Z_p \neq B_p $ in particular we are interested in the $p$-cycles that are not $p$-boundaries.
+\begin{definition}[homology groups and Betti numbers]
+	for a complex $K$ its $p$-th homology group is the quotient $H_p Z_p/B_p $.\\
+	The $p$-th Betti number is $ \beta_p $ the number of generators of $H_p$.
+\end{definition} 
+
+%todo: write example
+
+\begin{definition}[induced map]
+	Consider two complexes $K$, $L$ and a simplicial map $ f: K \to L $. We have a way to transform $f$ into a map $ f_\sharp: C_p(K) \to C_p(L) $, in this way 
+	\[ c = \sum_{i=1}^n a_i \sigma_i \ \mapsto \ \sum_{i=1}^{??} a_i \tau_i  \]
+	Where $ \tau_i = f(\sigma_i) $ if it has dimension $p$ or $ \tau_i =0 $ otherwise. $f_\sharp$ is the induced map of $f$.
+\end{definition}
+
+%todo: more examples
 
 \end{document}
