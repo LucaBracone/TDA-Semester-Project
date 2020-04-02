@@ -9,11 +9,11 @@
 \usepackage[english]{babel}
 \usepackage{amssymb}
 \usepackage{amsthm}
+\usepackage{todonotes}
 \usepackage{hyperref}
 \usepackage{pgf,tikz,pgfplots}
-\pgfplotsset{compat=1.15}
 \usepackage{mathrsfs}
-\usetikzlibrary{arrows}
+\usepackage{dirtytalk}
 \usepackage[english]{babel}
 \usepackage[letterpaper, portrait, margin=1.2in]{geometry}
 %\usepackage{fancyhdr}
@@ -38,6 +38,7 @@
 \newtheorem{thm}{Theorem}[section]
 \newtheorem{lemma}[thm]{Lemma}
 \newtheorem*{FLH}{Fundamental Lemma of Homology}
+\newtheorem*{ER}{Elder Rule}
 %definitions
 \theoremstyle{definition}
 \newtheorem{definition}{Definition}[section]
@@ -45,14 +46,17 @@
 
 %remarks
 \theoremstyle{remark}
-
 \newtheorem{remark}{Remark}[section]
+
+%pgfplotsset
+\pgfplotsset{compat=1.16}
+
 %title
 \title{Summary}
 \author{Luca Bracone}
-%TODO: add abstract. 
 \begin{document}
 	\maketitle
+	\todo{abstract here}
 	\section{Basic Machine Learning}
 	\subsection{Neural Networks}
 	\begin{definition}[Perceptron]
@@ -154,7 +158,7 @@ For some ANN, $T$ and some input $ (x_1,...,x_n) $, we have a desired output $ (
 	The \emph{dimension} of $K$ is $ \dim K = \max_{\sigma \in K} \dim \sigma $ and the dimension of a $k$-simplex is $k$.
 	The \emph{underlying space} of $K$, $|K|$ is the topological space $ \bigcup_{\sigma \in K} \sigma $ with the subspace topology.
 	\end{definition}
-%todo:add examples of complexes
+\todo{simple examples of complexes}
 \begin{definition}[Triangulation]
 	Let $X$ be a topological space and $K$ a simplicial complex, if there exists a homeomorphism $ \phi : X \to |K| $ we say that $X$ is triangulable. In that case the couple $ (K,\phi) $ is called a triangulation of $X$
 \end{definition}
@@ -169,7 +173,6 @@ For some ANN, $T$ and some input $ (x_1,...,x_n) $, we have a desired output $ (
 	
 	\begin{definition}[Star and Link]
 		Let $K$ be a simplicial complex and pick $ \sigma \in K $. Its \emph{star}, $ st\sigma = \{ \tau \in K \st \tau < \sigma \} $. unfortunately it's not a sub-complex of $K$ because it's not closed under taking faces. For that we define the \emph{closed star }$ \overline{st}\sigma $ the smallest sub-complex that contains the star.
-		%todo explain this better
 		Similarly, the \emph{link} of a simplex $ lk\sigma = \{ \tau \in \overline{st}\sigma \st \tau \cap \sigma = \emptyset \} $ the set of simplices in the closed star that don't touch $\sigma$
 	\end{definition}
 	
@@ -193,7 +196,7 @@ Turns out $ \partial_p : C_p \to C_{p-1} $ is a group homomorphism. for a simpli
 
 \begin{FLH}
 	For all $p$ and $d \in C_{p+1}$, we have $ \partial_{p} \partial_{p+1} d = 0$
-	%todo: add proof ??
+	\todo{add proof?}
 \end{FLH}
 
 Whenever we have an interesting homomorphism it is natural to want to know more about its kernel and image, in this case they have special names:
@@ -221,7 +224,8 @@ Lastly, for $H_2$ there is only one 2-cycle that is not a 2-boundary, which is t
 The group $H_3$ is trivial because there are no 3-chains. \\
 We see that the Betti numbers are $\beta_0 = 0$, $\beta_1 = 3$, $\beta_2 = 1$, $\beta_n = 0$ for all $n \geq 3$
 
-\begin{figure}[h!]
+\begin{figure}[ht!]
+\begin{center}
 \begin{tikzpicture}
 
 \coordinate (v2) at (0,-3.5) {};
@@ -249,12 +253,11 @@ We see that the Betti numbers are $\beta_0 = 0$, $\beta_1 = 3$, $\beta_2 = 1$, $
 \filldraw[cyan] (v5) circle (2pt) ;
 \end{tikzpicture}
 \label{fig:example1}
-
+\end{center}
 \end{figure}
 \end{example}
 
-
-%todo: write example
+\todo{rewrite example}
 
 \begin{definition}[Induced Map]
 	Consider two complexes $K$, $L$ and a simplicial map $ f: K \to L $. We have a way to transform $f$ into a map $ f_\sharp: C_p(K) \to C_p(L) $, in this way 
@@ -262,9 +265,61 @@ We see that the Betti numbers are $\beta_0 = 0$, $\beta_1 = 3$, $\beta_2 = 1$, $
 	Where $ \tau_i = f(\sigma_i) $ if it has dimension $p$ or $ \tau_i =0 $ otherwise. We call $f_\sharp$ the \emph{induced map} of $f$.
 \end{definition}
 
-%todo: more examples
+\todo{more examples ?}
+\section{Persistent Homology}
 
+\begin{definition}[Level Sets]
+For a topological space $X$ and a map $f:X\to \R$, its \emph{level sets} are $ X_a=\{ x \in X \st f(x) \leq a\} $
+\end{definition}
 
+Suppose $f$ is continuous. For each $X_a$ we consider its connected components, we can imagine a picture where on the vertical axis we have the real number line and horizontally we plot a point for each connected component of $X_a$. This effectively gives a graph, and if $f$ is monotone, a tree. This is called the \emph{merge tree} of $X$ under $f$. Its vertices are located at times where two components merge, and the edges represent the existence of a component over time. \\
+We would like to attach an identity to these components, so we use the following rule:
+\begin{ER}
+When two components merge, we keep the oldest one. The younger is said to die or to merge into the older one.
+\end{ER}
 
+Using the level sets, we define an increasing chain of subcomplexes. Indeed, if $f:K \to \R$ is monotone (that is whenever $\sigma < \tau$, $f(\sigma) < f(\tau)$) and continuous, the level sets $f\inv(-\infty, a] = K(a)$ are subcomplexes of $K$. \\
+We now write $K_i$ instead of $K(a_i)$.
+\begin{definition}[Filtration]
+Let $K$ be a complex. The sequence of inclusions,
+\[ \emptyset = K_0 \subseteq K_1 \subseteq \dots \subseteq K_{n-1} \subseteq K_n = K \] is called a \emph{filtration} of $f$.
+\end{definition}
+
+From a filtration we obtain a sequence of Homology groups 
+\[ H_p(K_0) \rightarrow \dots \rightarrow H_p(K_n) \] where the arrows are the homomorphisms induced by the inclusion maps.
+
+\begin{definition}[Persistent Homology Groups and Persistent Betti Numbers]
+Considering the above chain of homology groups, the $p$-th persistent homology groups are defined as $H_p^{i,j} := \img f_p^{i,j}$. Where $f_p^{i,j}: H_p(K_i) \hookrightarrow H_p(K_j)$ is the homomorphism induced by the inclusion. \\
+The $p$-th persistent \emph{Betti Number}, $\beta_p^{i,j}$ is the number of generators of $H_p^{i,j}$
+\end{definition}
+\begin{remark}
+Under this definition, $H_p^{i,i}$ is the $p$-th homology group of $K_i$
+\end{remark}
+
+\todo{add Adélie's example}
+The classes of $H_p(K_i)$ represent $p$-dimesional holes \say{when viewing $K$ at a certain resolution}. It is then apparent that if a certain $p$-dimensional hole is visible for various resolutions, that it somehow exists or represents an important feature in the \say{real complex}. To make this idea clearer we introduce the following vocabulary.
+
+\begin{definition}
+Let $\gamma \in H_p^{i,i} $. If $\gamma \notin H_p^{i-1,i}$ we say that $\gamma$ is \emph{born at $K_i$}. \\
+Furthermore if $f_p^{i,j-1}(\gamma) \notin H_p^{i-1,j-1}$ and $f_p^{i,j} \in H_p^{i-1,j}$ then we say that $\gamma$ \emph{dies entering $K_j$} \\
+The \emph{persistence} of $\gamma$ is the number $a_j-a_i$
+\end{definition}
+
+Let $\mu_p^{i,j}$ be the number of classes born at $K_i$ and dying at $K_j$. In other words 
+\[ \mu_p^{i,j} = \left( \beta_p^{i,j-1} - \beta_p^{i,j} \right) - \left( \beta_p^{i-1,j-1} - \beta_p^{i-1,j}  \right) \]
+indeed, the first difference counts the classes that are born at or before $K_i$ and that die entering $K_j$ while the other counts those that are born strictly before $K_i$ and die entering $K_j$.
+
+We now look for a way to visualise all the gained information. For that, we look to \emph{Persistence Diagrams}. For each class that appears, draw a point at coordinates $(a_i,a_j)$ with multiplicity $\mu_p{i,j}$. Where $a_i$ is when it was born and $a_j$ when it died.
+
+\begin{example}
+Consider the persistence diagram illustrated in figure ~\ref{fig:torus-rips-persisntence} in page ~\pageref{fig:torus-rips-persisntence} computed using Vietoris-Rips filtration. It represents the persistence classes of a point cloud in the shape of a torus. The points that stick out from the diagonal are the classes whose persistence is greater, and thus most worthy of attention. We can see that the fact there is only one connected component is quickly detected \todo{Question: in that case, shouldn't the red points be higher?}. We also see that the filtration identifies three classes of 1-dimensional holes, one disappears quickly and the other two are the loops on the torus we are alredy familiar with. Finally, the 2-dimensional hole, i.e the \say{volume} of of the torus, is identified.
+\end{example}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=.5]{torus-rips-persistence.png}
+    \caption{Persistence diagram of a torus}
+    \label{fig:torus-rips-persisntence}
+\end{figure}
 
 \end{document}
